@@ -153,22 +153,36 @@
   function startMusic() {
     if (musicStarted) return;
 
-    audio.load();
+    // Reset audio to beginning
+    audio.currentTime = 0;
+    audio.volume = 0.3;
 
     const playPromise = audio.play();
 
     if (playPromise !== undefined) {
       playPromise
         .then(() => {
-          audio.volume = 0.3;
           musicStarted = true;
           musicToggle.classList.add('visible');
           console.log('Audio playback started successfully');
         })
         .catch(err => {
           console.log('Audio playback failed:', err.message);
+          // Try again on next user interaction
           musicStarted = false;
+          document.addEventListener('click', retryMusic, { once: true });
+          document.addEventListener('touchstart', retryMusic, { once: true });
         });
+    }
+  }
+
+  function retryMusic() {
+    if (!musicStarted) {
+      audio.play().then(() => {
+        audio.volume = 0.3;
+        musicStarted = true;
+        musicToggle.classList.add('visible');
+      }).catch(e => console.log('Retry failed:', e.message));
     }
   }
 
