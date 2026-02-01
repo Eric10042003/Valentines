@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1a0a0a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Valentine">
+  <meta name="description" content="A special Valentine's invitation just for you">
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
+
+  <title>Valentine</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Audio Element -->
+  <audio id="bgMusic" loop preload="auto">
+    <source src="lover.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Music Toggle -->
+  <button id="musicToggle" class="music-toggle" aria-label="Toggle music">
+    <svg class="icon-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+      <path class="sound-waves" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"/>
+    </svg>
+    <svg class="icon-mute hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+      <line x1="23" y1="9" x2="17" y2="15"/>
+      <line x1="17" y1="9" x2="23" y2="15"/>
+    </svg>
+  </button>
+
+  <!-- Floating Photos for Love Letter Screen (6 photos) -->
+  <div class="floating-photos" id="floatingPhotos">
+    <div class="photo-frame" data-position="1">
+      <img src="images/kiss1.jpg" alt="Memory" loading="lazy">
+    </div>
+    <div class="photo-frame" data-position="2">
+      <img src="images/kiss2.jpg" alt="Memory" loading="lazy">
+    </div>
+    <div class="photo-frame" data-position="3">
+      <img src="images/kiss3.jpg" alt="Memory" loading="lazy">
+    </div>
+    <div class="photo-frame" data-position="4">
+      <img src="images/love.jpg" alt="Memory" loading="lazy">
+    </div>
+    <div class="photo-frame" data-position="5">
+      <img src="images/biggy.jpg" alt="Memory" loading="lazy">
+    </div>
+    <div class="photo-frame" data-position="6">
+      <img src="images/selpi.jpg" alt="Memory" loading="lazy">
+    </div>
+  </div>
+
+  <!-- Stickers Container (for No button) -->
+  <div class="stickers-container" id="stickersContainer"></div>
+
+  <!-- Decorative Background Elements -->
+  <div class="bg-decorations" id="bgDecorations">
+    <div class="floating-heart fh-1"></div>
+    <div class="floating-heart fh-2"></div>
+    <div class="floating-heart fh-3"></div>
+    <div class="floating-heart fh-4"></div>
+    <div class="floating-heart fh-5"></div>
+    <div class="floating-petal fp-1"></div>
+    <div class="floating-petal fp-2"></div>
+    <div class="floating-petal fp-3"></div>
+    <div class="floating-petal fp-4"></div>
+    <div class="floating-petal fp-5"></div>
+    <div class="floating-petal fp-6"></div>
+    <div class="glow-orb go-1"></div>
+    <div class="glow-orb go-2"></div>
+    <div class="glow-orb go-3"></div>
+  </div>
+
+  <!-- Rose Petal Confetti Canvas (for heart completion) -->
+  <canvas id="petalCanvas"></canvas>
+
+  <!-- Screen 1: Heart Tap Intro -->
+  <section id="screenBoot" class="screen active">
+    <div class="heart-tap-container">
+      <p class="heart-tap-instruction">Tap to fill my heart</p>
+      <div class="heart-tap-wrapper" id="heartTapWrapper">
+        <!-- Heart outline (unfilled) -->
+        <svg class="heart-outline" viewBox="0 0 100 90" id="heartOutline">
+          <defs>
+            <clipPath id="heartClip">
+              <path d="M50 88C50 88 5 55 5 30C5 15 17 5 32 5C42 5 50 12 50 12C50 12 58 5 68 5C83 5 95 15 95 30C95 55 50 88 50 88Z"/>
+            </clipPath>
+            <linearGradient id="heartFillGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+              <stop offset="0%" style="stop-color:#8b2942"/>
+              <stop offset="100%" style="stop-color:#d4627a"/>
+            </linearGradient>
+          </defs>
+          <!-- Outline stroke -->
+          <path class="heart-stroke" d="M50 88C50 88 5 55 5 30C5 15 17 5 32 5C42 5 50 12 50 12C50 12 58 5 68 5C83 5 95 15 95 30C95 55 50 88 50 88Z" fill="none" stroke="rgba(139, 41, 66, 0.5)" stroke-width="3"/>
+          <!-- Fill mask (animated from bottom) -->
+          <g clip-path="url(#heartClip)">
+            <rect id="heartFillRect" x="0" y="90" width="100" height="90" fill="url(#heartFillGradient)"/>
+          </g>
+          <!-- Sparkle particles -->
+          <g id="heartSparkles"></g>
+        </svg>
+        <!-- Pulse ring effect -->
+        <div class="heart-pulse-ring" id="heartPulseRing"></div>
+      </div>
+      <div class="heart-progress-container">
+        <div class="heart-progress-bar" id="heartProgressBar"></div>
+      </div>
+      <p class="heart-tap-counter"><span id="tapCount">0</span> / <span id="tapTotal">10</span></p>
+    </div>
+  </section>
+
+  <!-- Screen 2: Love Letter with Envelope -->
+  <section id="screenLoveLetter" class="screen">
+    <div class="envelope-scene">
+      <!-- Envelope -->
+      <div class="envelope" id="envelope">
+        <div class="envelope-back"></div>
+        <div class="envelope-flap"></div>
+        <div class="envelope-front"></div>
+
+        <!-- Letter Paper -->
+        <div class="letter-paper" id="letterPaper">
+          <div class="letter-content">
+            <p class="letter-paragraph" data-index="0">
+              Hi love, I just want to let you know how much you matter to me.
+            </p>
+            <p class="letter-paragraph" data-index="1">
+              On the boring days when nothing much happened, even on the days that doesn't go well and everything feels too much because you haven't ate Kuya Gil's Bagnet, your existence means everything and way more than you realize.
+            </p>
+            <p class="letter-paragraph" data-index="2">
+              I admire your strength for trying to live a better life, your patience and understanding even when everything seems unreasonable, and the way you keep showing up as yourself no matter what the circumstances are.
+            </p>
+            <p class="letter-paragraph" data-index="3">
+              I'm grateful for you exactly as you are and I love you always, my love.
+            </p>
+          </div>
+        </div>
+
+        <!-- Heart Seal -->
+        <div class="envelope-seal">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Tap Hint -->
+      <div class="tap-hint envelope-hint" id="envelopeHint">
+        <span class="hint-text">Tap to open</span>
+      </div>
+
+      <!-- Continue Hint (after letter is revealed) -->
+      <div class="tap-hint letter-hint" id="letterHint">
+        <span class="hint-text">Tap to continue</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 3: Message -->
+  <section id="screenMessage" class="screen">
+    <!-- Red String of Fate -->
+    <svg class="red-string" viewBox="0 0 400 600" preserveAspectRatio="none">
+      <defs>
+        <filter id="stringGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <path class="string-path" d="M-20,0 Q100,150 200,200 T300,350 Q350,450 200,500 T50,600"
+            fill="none" stroke="#8b2942" stroke-width="2" filter="url(#stringGlow)"/>
+      <path class="string-path string-path-2" d="M420,50 Q300,120 250,250 T150,400 Q100,500 200,580"
+            fill="none" stroke="#6b1c2a" stroke-width="1.5" filter="url(#stringGlow)"/>
+    </svg>
+
+    <!-- Floating Mini Hearts -->
+    <div class="message-hearts">
+      <div class="mini-heart mh-1"></div>
+      <div class="mini-heart mh-2"></div>
+      <div class="mini-heart mh-3"></div>
+      <div class="mini-heart mh-4"></div>
+      <div class="mini-heart mh-5"></div>
+    </div>
+
+    <!-- Sparkle Dots -->
+    <div class="sparkle-field">
+      <div class="sparkle-dot sd-1"></div>
+      <div class="sparkle-dot sd-2"></div>
+      <div class="sparkle-dot sd-3"></div>
+      <div class="sparkle-dot sd-4"></div>
+      <div class="sparkle-dot sd-5"></div>
+      <div class="sparkle-dot sd-6"></div>
+      <div class="sparkle-dot sd-7"></div>
+      <div class="sparkle-dot sd-8"></div>
+    </div>
+
+    <!-- Infinity Symbol -->
+    <div class="infinity-symbol">
+      <svg viewBox="0 0 100 50" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M25,25 C25,10 10,10 10,25 C10,40 25,40 25,25 C25,10 40,10 50,25 C60,40 75,40 75,25 C75,10 60,10 50,25 C40,40 25,40 25,25" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <div class="message-container">
+      <div class="message-lines">
+        <p class="message-line" data-delay="0">I've been looking forward to this moment.</p>
+        <p class="message-line" data-delay="1200">Because you matter to me.</p>
+        <p class="message-line" data-delay="2400">And I want our first Valentine's to be special.</p>
+      </div>
+      <div class="tap-hint" id="messageHint">
+        <span class="hint-text">Tap to continue</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 4: Invitation -->
+  <section id="screenInvitation" class="screen">
+    <div class="invitation-container" id="invitationContainer">
+      <h1 class="invitation-title">Will you be my Valentine?</h1>
+      <div class="invitation-buttons" id="invitationButtons">
+        <button class="btn accept" id="btnYes">Yes <span class="heart-emoji">❤️</span></button>
+        <button class="btn decline" id="btnNo">No <span class="emoji">🙃</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 5: Confirmation -->
+  <section id="screenConfirmation" class="screen">
+    <!-- Decorative corners -->
+    <div class="confirmation-decor decor-top-left">
+      <svg viewBox="0 0 60 60"><path d="M5 55 Q5 5 55 5" fill="none" stroke="rgba(139, 41, 66, 0.4)" stroke-width="2"/></svg>
+    </div>
+    <div class="confirmation-decor decor-top-right">
+      <svg viewBox="0 0 60 60"><path d="M55 55 Q55 5 5 5" fill="none" stroke="rgba(139, 41, 66, 0.4)" stroke-width="2"/></svg>
+    </div>
+    <div class="confirmation-decor decor-bottom-left">
+      <svg viewBox="0 0 60 60"><path d="M5 5 Q5 55 55 55" fill="none" stroke="rgba(139, 41, 66, 0.4)" stroke-width="2"/></svg>
+    </div>
+    <div class="confirmation-decor decor-bottom-right">
+      <svg viewBox="0 0 60 60"><path d="M55 5 Q55 55 5 55" fill="none" stroke="rgba(139, 41, 66, 0.4)" stroke-width="2"/></svg>
+    </div>
+
+    <!-- Floating decorative elements -->
+    <div class="decor-element decor-heart-1">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    </div>
+    <div class="decor-element decor-heart-2">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    </div>
+    <div class="decor-element decor-heart-3">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+    </div>
+    <div class="decor-element decor-star-1">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z"/></svg>
+    </div>
+    <div class="decor-element decor-star-2">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z"/></svg>
+    </div>
+    <div class="decor-element decor-rose-1">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 1.5.7 2.8 1.7 3.7C8.5 11 8 12.2 8 13.5c0 2.5 2 4.5 4.5 4.5s4.5-2 4.5-4.5c0-1.3-.5-2.5-1.2-3.3 1-.9 1.7-2.2 1.7-3.7C17.5 4 15.5 2 13 2h-1zm0 3c.8 0 1.5.7 1.5 1.5S12.8 8 12 8s-1.5-.7-1.5-1.5S11.2 5 12 5z"/><path d="M12 18c-1 0-2 .5-2.5 1.3-.3.4-.5.9-.5 1.4 0 .7.3 1.3.8 1.8.5.4 1.2.5 1.7.5h1c.5 0 1.2-.1 1.7-.5.5-.5.8-1.1.8-1.8 0-.5-.2-1-.5-1.4-.5-.8-1.5-1.3-2.5-1.3z"/></svg>
+    </div>
+    <div class="decor-element decor-rose-2">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C9.5 2 7.5 4 7.5 6.5c0 1.5.7 2.8 1.7 3.7C8.5 11 8 12.2 8 13.5c0 2.5 2 4.5 4.5 4.5s4.5-2 4.5-4.5c0-1.3-.5-2.5-1.2-3.3 1-.9 1.7-2.2 1.7-3.7C17.5 4 15.5 2 13 2h-1zm0 3c.8 0 1.5.7 1.5 1.5S12.8 8 12 8s-1.5-.7-1.5-1.5S11.2 5 12 5z"/><path d="M12 18c-1 0-2 .5-2.5 1.3-.3.4-.5.9-.5 1.4 0 .7.3 1.3.8 1.8.5.4 1.2.5 1.7.5h1c.5 0 1.2-.1 1.7-.5.5-.5.8-1.1.8-1.8 0-.5-.2-1-.5-1.4-.5-.8-1.5-1.3-2.5-1.3z"/></svg>
+    </div>
+
+    <div class="confirmation-container">
+      <div class="checkmark-circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h2 class="confirmation-title">Invitation Accepted</h2>
+      <div class="event-details">
+        <div class="detail-item">
+          <span class="detail-label">Date</span>
+          <span class="detail-value">February 14, 2026</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Time</span>
+          <span class="detail-value">7:00 PM</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Place</span>
+          <span class="detail-value">Secret</span>
+        </div>
+      </div>
+      <p class="closing-message">I can't wait to spend this day with you.</p>
+    </div>
+    <!-- Yes Sticker - repositioned -->
+    <div class="yes-sticker" id="yesSticker">
+      <img src="images/yez.png" alt="Yes!">
+    </div>
+    <canvas id="confettiCanvas"></canvas>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
