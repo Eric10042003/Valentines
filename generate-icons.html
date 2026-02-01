@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Generate PWA Icons</title>
+  <style>
+    body { font-family: system-ui; padding: 2rem; background: #1a0a0a; color: #f5f0e8; }
+    canvas { border: 1px solid #333; margin: 1rem; }
+    a { color: #d4a5a5; display: block; margin: 0.5rem 0; }
+    .container { display: flex; gap: 2rem; flex-wrap: wrap; }
+  </style>
+</head>
+<body>
+  <h1>PWA Icon Generator</h1>
+  <p>Right-click each canvas and "Save Image As" with the filename shown:</p>
+  <div class="container">
+    <div>
+      <canvas id="icon192" width="192" height="192"></canvas>
+      <p>Save as: <strong>icon-192.png</strong></p>
+    </div>
+    <div>
+      <canvas id="icon512" width="512" height="512"></canvas>
+      <p>Save as: <strong>icon-512.png</strong></p>
+    </div>
+  </div>
+
+  <script>
+    function drawIcon(canvas) {
+      const ctx = canvas.getContext('2d');
+      const size = canvas.width;
+      const scale = size / 100;
+
+      // Background
+      ctx.fillStyle = '#1a0a0a';
+      ctx.fillRect(0, 0, size, size);
+
+      // Heart
+      ctx.save();
+      ctx.translate(size / 2, size / 2 + 5 * scale);
+      ctx.scale(scale * 0.7, scale * 0.7);
+
+      ctx.beginPath();
+      ctx.moveTo(0, -10);
+      ctx.bezierCurveTo(-25, -40, -50, -15, -50, 10);
+      ctx.bezierCurveTo(-50, 35, -25, 55, 0, 70);
+      ctx.bezierCurveTo(25, 55, 50, 35, 50, 10);
+      ctx.bezierCurveTo(50, -15, 25, -40, 0, -10);
+      ctx.closePath();
+
+      // Gradient fill
+      const gradient = ctx.createLinearGradient(-50, -40, 50, 70);
+      gradient.addColorStop(0, '#8b2942');
+      gradient.addColorStop(1, '#6b1c2a');
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      // Subtle glow
+      ctx.shadowColor = '#8b2942';
+      ctx.shadowBlur = 20 * scale;
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    drawIcon(document.getElementById('icon192'));
+    drawIcon(document.getElementById('icon512'));
+  </script>
+</body>
+</html>
